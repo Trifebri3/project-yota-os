@@ -544,7 +544,7 @@
                                 
                                 <!-- Big Charming Photo with Tape / Badge -->
                                 <div class="aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-100 relative shadow-inner">
-                                    <img src="{{ $logItem['photo_path'] }}" alt="{{ $logItem['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                    <img src="{{ $logItem['photo_path'] }}" alt="{{ $logItem['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy" onerror="this.onerror=null; this.src='/images/projects/mangrove.jpg';">
                                     <div class="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-[9px] font-bold text-slate-700 shadow-sm flex items-center gap-1">
                                         <span>📷</span>
                                         <span>Foto Asli Logbook</span>
@@ -605,7 +605,7 @@
                     </div>
 
                     <div class="aspect-video w-full rounded-2xl overflow-hidden bg-slate-100 shadow-md">
-                        <img :src="activeLogDetail ? activeLogDetail.photo_path : ''" class="w-full h-full object-cover">
+                        <img :src="activeLogDetail ? activeLogDetail.photo_path : ''" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/images/projects/mangrove.jpg';">
                     </div>
 
                     <div class="space-y-2">
