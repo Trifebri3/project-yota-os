@@ -332,8 +332,10 @@
             // Initialize Leaflet Map focused on West Java (where all projects are situated)
             const map = L.map('map').setView([-6.800000, 107.100000], 8);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap contributors',
+                subdomains: 'abcd',
+                maxZoom: 20
             }).addTo(map);
 
             fetch('/map-data')

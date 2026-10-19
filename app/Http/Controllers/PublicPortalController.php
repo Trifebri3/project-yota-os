@@ -228,9 +228,17 @@ class PublicPortalController extends Controller
 
         // Location Photos
         $locationPhotos = collect();
-        if ($program->cover_image) $locationPhotos->push(['url' => $program->cover_image, 'caption' => 'Tapak Konservasi Pesisir']);
+        if ($program->cover_image) {
+            $locationPhotos->push([
+                'url' => str_starts_with($program->cover_image, 'http') ? $program->cover_image : '/' . ltrim($program->cover_image, '/'),
+                'caption' => 'Tapak Konservasi Pesisir'
+            ]);
+        }
         if ($program->banner_program && $program->banner_program !== $program->cover_image) {
-            $locationPhotos->push(['url' => $program->banner_program, 'caption' => 'Pemandangan Garis Pantai & Sabuk Hijau']);
+            $locationPhotos->push([
+                'url' => str_starts_with($program->banner_program, 'http') ? $program->banner_program : '/' . ltrim($program->banner_program, '/'),
+                'caption' => 'Pemandangan Garis Pantai & Sabuk Hijau'
+            ]);
         }
         
         // Add additional field landscape photos from real logs
@@ -239,7 +247,11 @@ class PublicPortalController extends Controller
         })->take(3);
 
         foreach ($landscapeLogs as $ll) {
-            $locationPhotos->push(['url' => $ll->photo_path, 'caption' => $ll->title]);
+            $photoUrl = $ll->photo_path;
+            if ($photoUrl && !str_starts_with($photoUrl, 'http')) {
+                $photoUrl = '/' . ltrim($photoUrl, '/');
+            }
+            $locationPhotos->push(['url' => $photoUrl, 'caption' => $ll->title]);
         }
 
         if ($locationPhotos->isEmpty()) {

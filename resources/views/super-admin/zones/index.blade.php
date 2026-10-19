@@ -160,8 +160,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             map = L.map('draw-map').setView([-6.200000, 106.816666], 11);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap contributors',
+                subdomains: 'abcd',
+                maxZoom: 20
             }).addTo(map);
 
             // Draw click points

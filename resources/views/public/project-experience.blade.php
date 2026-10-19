@@ -325,7 +325,7 @@
                                 <div @click.stop="activeLocationPhotoIndex = {{ $lIdx }}"
                                      :class="activeLocationPhotoIndex === {{ $lIdx }} ? 'ring-2 ring-emerald-500 scale-105 shadow-md' : 'opacity-75 hover:opacity-100'"
                                      class="rounded-2xl overflow-hidden aspect-video cursor-pointer transition shadow-sm bg-slate-100">
-                                    <img src="{{ $lPhoto['url'] }}" alt="{{ $lPhoto['caption'] }}" class="w-full h-full object-cover">
+                                    <img src="{{ $lPhoto['url'] }}" alt="{{ $lPhoto['caption'] }}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/images/projects/mangrove.jpg';">
                                 </div>
                             @endforeach
                         </div>
@@ -1051,8 +1051,10 @@
                     if (!mapEl) return;
                     
                     const map = L.map('deck-map').setView([-6.089000, 106.720000], 11);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap'
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap contributors',
+                        subdomains: 'abcd',
+                        maxZoom: 20
                     }).addTo(map);
 
                     fetch('/map-data?program_id={{ $program->id }}')
