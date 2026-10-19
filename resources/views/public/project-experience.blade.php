@@ -125,6 +125,14 @@
 
             <!-- Slideshow Mode Controls -->
             <div class="flex items-center gap-2">
+                <!-- Evidence Review & Official Report Document Button -->
+                <a href="{{ route('public.projects.evidence-report', $program->id) }}" target="_blank"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-sm transition">
+                    <span>📑</span>
+                    <span class="hidden md:inline">Laporan & Tinjauan Bukti (v1.0)</span>
+                    <span class="md:hidden">Laporan v1.0</span>
+                </a>
+
                 <!-- Status Badge (Autoplay vs Paused) -->
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-[11px] font-mono">
                     <template x-if="isPaused">
@@ -234,6 +242,23 @@
                             </div>
                         </div>
                     @endif
+
+                    <!-- Official Document Badge & Direct Action Link -->
+                    <div class="seamless-card p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-emerald-500 text-slate-950 font-black text-[9px] uppercase px-2 py-0.5 rounded">Versi 1.0</span>
+                                <strong class="text-xs font-black tracking-tight">Dokumen Kerja: Laporan Program & Tinjauan Bukti</strong>
+                            </div>
+                            <p class="text-[11px] text-slate-300">
+                                372 kg Sampah Pesisir &bull; 400 kg Residu Tungku &bull; 12 Anggota Bale Resik &bull; 83 UMKM &bull; RAB Rp15.6M
+                            </p>
+                        </div>
+                        <a href="{{ route('public.projects.evidence-report', $program->id) }}" target="_blank"
+                           class="shrink-0 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow">
+                            <span>Buka Laporan & Bukti</span> &rarr;
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Right: Hero Banner (Full-Bleed Rounded) -->
@@ -412,13 +437,13 @@
                     <span class="text-3xl block mb-2">🌳</span>
                     <span class="text-xs font-bold text-teal-800 uppercase tracking-wider block">Potensi Karbon Diserap</span>
                     <strong class="text-4xl font-black text-teal-600 block">310.0</strong>
-                    <span class="text-xs text-teal-700 font-medium">Kg CO₂e (Biomassa tegakan mangrove)</span>
+                    <span class="text-xs text-teal-700 font-medium">Kg CO₂e (Potensi reduksi daur ulang & maggot BSF)</span>
                 </div>
             </div>
 
             <div class="seamless-card p-6 text-xs text-slate-600 leading-relaxed max-w-3xl mx-auto text-center">
                 <strong class="text-slate-900 block mb-1">Metodologi Ilmiah Pengukuran:</strong>
-                Emisi dihitung otomatis dari logbook perjalanan kendaraan dan genset, sedangkan reduksi karbon dihitung dari timbulan sampah organik yang diolah dan ditimbang digital di Bale Resik.
+                Emisi dihitung otomatis dari logbook transportasi dan operasional, sedangkan reduksi karbon dihitung dari timbulan 372 kg sampah pesisir yang dipindahkan ke TPS3R, pengomposan sampah organik pasar, serta pengolahan residu ber-SOP di Bale Resik.
             </div>
         </div>
 
@@ -437,9 +462,9 @@
                 <!-- Day Stepper Controller (Previous / Current Day / Next) -->
                 <div class="flex items-center gap-2">
                     <button 
-                        @click.stop="activeDayIndex = Math.max(0, activeDayIndex - 1)" 
-                        :disabled="activeDayIndex === 0"
-                        :class="activeDayIndex === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-slate-200 active:scale-95'"
+                        @click.stop="activeDayIndex = Math.max(0, Number(activeDayIndex) - 1)" 
+                        :disabled="Number(activeDayIndex) === 0"
+                        :class="Number(activeDayIndex) === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-slate-200 active:scale-95'"
                         class="p-2.5 rounded-full bg-slate-100 text-slate-700 font-bold transition shadow-sm"
                         title="Hari Sebelumnya">
                         &larr;
@@ -449,15 +474,15 @@
                     <div class="px-4 py-1.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-2">
                         <span class="text-lg">🌟</span>
                         <div>
-                            <strong class="text-xs sm:text-sm font-black text-slate-900 block" x-text="dailyGroupTitles[activeDayIndex] || 'Hari Kegiatan'"></strong>
-                            <span class="text-[10px] text-emerald-700 font-mono block -mt-0.5" x-text="'Hari ke-' + (activeDayIndex + 1) + ' dari ' + totalDays + ' &bull; ' + (dailyGroupDates[activeDayIndex] || '')"></span>
+                            <strong class="text-xs sm:text-sm font-black text-slate-900 block" x-text="dailyGroupTitles[Number(activeDayIndex)] || 'Hari Kegiatan'"></strong>
+                            <span class="text-[10px] text-emerald-700 font-mono block -mt-0.5" x-text="'Hari ke-' + (Number(activeDayIndex) + 1) + ' dari ' + totalDays + ' &bull; ' + (dailyGroupDates[Number(activeDayIndex)] || '')"></span>
                         </div>
                     </div>
 
                     <button 
-                        @click.stop="activeDayIndex = Math.min(totalDays - 1, activeDayIndex + 1)" 
-                        :disabled="activeDayIndex >= totalDays - 1"
-                        :class="activeDayIndex >= totalDays - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-slate-200 active:scale-95'"
+                        @click.stop="activeDayIndex = Math.min(totalDays - 1, Number(activeDayIndex) + 1)" 
+                        :disabled="Number(activeDayIndex) >= totalDays - 1"
+                        :class="Number(activeDayIndex) >= totalDays - 1 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-slate-200 active:scale-95'"
                         class="p-2.5 rounded-full bg-slate-100 text-slate-700 font-bold transition shadow-sm"
                         title="Hari Selanjutnya">
                         &rarr;
@@ -468,10 +493,10 @@
                 <div class="flex items-center gap-2">
                     <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider hidden sm:inline">Lompat Cepat:</span>
                     <select 
-                        x-model="activeDayIndex" 
+                        x-model.number="activeDayIndex" 
                         class="text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3.5 py-2 rounded-xl border-0 focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-sm">
                         @foreach($dailyGroups as $dIdx => $dG)
-                            <option value="{{ $dIdx }}">
+                            <option :value="{{ $dIdx }}" value="{{ $dIdx }}">
                                 {{ $dG['formatted_day'] }} — {{ Str::limit($dG['primary_title'], 28) }} ({{ $dG['total_photos'] }} foto)
                             </option>
                         @endforeach
@@ -503,9 +528,9 @@
 
             <!-- Multi-Photo Visual Story Wall (Banyak Gambar, Super Enak Dilihat, Lucu) -->
             @foreach($dailyGroups as $dIdx => $dGroup)
-                <div x-show="activeDayIndex === {{ $dIdx }}" x-transition class="space-y-4">
+                <div x-show="Number(activeDayIndex) === {{ $dIdx }}" x-transition class="space-y-4">
                     <!-- Photo Grid with Polaroid Feel & Cheerful Notes -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-h-[420px] overflow-y-auto custom-scroll pr-1 pb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-h-[500px] overflow-y-auto custom-scroll pr-1 pb-4">
                         @foreach($dGroup['logs'] as $logItem)
                             <div x-show="activeVolunteerFilter === 'all' || activeVolunteerFilter === '{{ $logItem['user_id'] }}'"
                                  class="polaroid-card p-3 space-y-3 flex flex-col justify-between group cursor-pointer"
@@ -828,9 +853,19 @@
                             <h4 class="text-xs font-black text-slate-900 leading-snug">{{ $out->title }}</h4>
                             <p class="text-[11px] text-slate-500 line-clamp-3 leading-relaxed">{{ $out->description }}</p>
                         </div>
-                        <div class="pt-2 border-t border-slate-100 text-[10px] text-slate-400 flex justify-between">
-                            <span class="font-mono text-emerald-700 font-bold">{{ $out->ip_number ?? 'VERIFIED' }}</span>
-                            <span class="font-bold text-slate-600">{{ $out->authors_or_team }}</span>
+                        <div class="pt-2 border-t border-slate-100 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+                            <span class="font-mono text-emerald-700 font-bold truncate max-w-[120px]">{{ $out->ip_number ?? 'VERIFIED' }}</span>
+                            @if($out->evidence_url === '#laporan-lengkap')
+                                <a href="{{ route('public.projects.evidence-report', $program->id) }}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-0.5 rounded-lg text-[9px] transition shrink-0">
+                                    Buka Dokumen &rarr;
+                                </a>
+                            @elseif(str_starts_with($out->evidence_url ?? '', 'http'))
+                                <a href="{{ $out->evidence_url }}" target="_blank" class="bg-slate-900 hover:bg-emerald-600 text-white font-bold px-2 py-0.5 rounded text-[9px] transition shrink-0">
+                                    Kunjungi &rarr;
+                                </a>
+                            @else
+                                <span class="font-bold text-slate-600 truncate max-w-[110px]">{{ $out->authors_or_team }}</span>
+                            @endif
                         </div>
                     </div>
                 @empty

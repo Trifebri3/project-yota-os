@@ -87,26 +87,27 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        // 2. Create Program: Collaborative Action Purbayani 2026
+        // 2. Create Program: Collaborative Action Program Purbayani 2026 (CAP)
         $program = Program::create([
-            'name' => 'Collaborative Action Purbayani 2026',
-            'description' => 'Restorasi kawasan pesisir Purbayani melalui aksi penanaman pohon mangrove, pembersihan sampah plastik, dan pengembangan UMKM ramah lingkungan.',
-            'cover_image' => null,
-            'kategori_program' => 'Lingkungan',
+            'name' => 'Collaborative Action Program Purbayani 2026 (CAP)',
+            'description' => 'Intervensi berbasis komunitas yang menggabungkan aksi bersih kawasan pesisir, pengembangan fasilitas pengelolaan sampah, edukasi, penguatan kelompok masyarakat Bale Resik, serta dukungan digitalisasi dan promosi kawasan.',
+            'cover_image' => '/images/projects/mangrove.jpg',
+            'banner_program' => '/images/projects/mangrove.jpg',
+            'kategori_program' => 'Pengelolaan Sampah & Komunitas',
             'status' => 'aktif',
-            'start_date' => Carbon::now()->subMonths(1),
-            'end_date' => Carbon::now()->addMonths(5),
+            'start_date' => Carbon::create(2026, 7, 5),
+            'end_date' => Carbon::create(2026, 8, 5), // 31 hari
             'project_officer_id' => $projectOfficer->id,
             'supervisor_id' => $supervisor->id,
-            'mitra' => 'DLH Jawa Barat',
-            'sponsor' => 'Pertamina CSR',
-            'organisasi_pelaksana' => 'Yota Foundation',
-            'tujuan_program' => 'Membangun ketahanan ekosistem pesisir dan meningkatkan literasi karbon warga lokal.',
-            'target_capaian' => '10.000 mangrove tertanam, reduction 500 Kg CO2e emisi harian, 2 ton sampah terolah.',
+            'mitra' => 'Bale Resik, Dinas Lingkungan Hidup (DLH), UMKM & Pelaku Wisata',
+            'sponsor' => 'Yayasan Yota & Kontribusi Swadaya Anggota',
+            'organisasi_pelaksana' => 'Collaborative Action Program Taskforce & Kelompok Bale Resik',
+            'tujuan_program' => 'Penguatan kapasitas komunitas dan sistem lokal untuk mengelola sampah, meningkatkan partisipasi masyarakat, memperluas edukasi, dan mendukung visibilitas ekonomi lokal melalui sarana fisik serta digital.',
+            'target_capaian' => '372 kg sampah pesisir dibawa ke TPS3R, 400 kg residu diproses tungku minim asap, 17 kg maggot, 12 anggota Bale Resik, 127 peserta edukasi, 34 KK permukiman, 83 UMKM & 37 titik GIS terdata.',
             'stats' => [
-                'volunteers_count' => 15,
-                'beneficiaries_count' => 800,
-                'carbon_offset' => 120,
+                'volunteers_count' => 33,
+                'beneficiaries_count' => 127,
+                'carbon_offset' => 52.0,
             ],
             'settings' => [
                 'workflow' => ['stages' => ['draft', 'active', 'completed']],
@@ -258,5 +259,8 @@ class DatabaseSeeder extends Seeder
             'model_id' => $customForm->id,
             'new_values' => ['name' => $customForm->name],
         ]);
+
+        // 11. Populate Full Impact Experience & Programs via InteractiveImpactSeeder
+        $this->call(InteractiveImpactSeeder::class);
     }
 }

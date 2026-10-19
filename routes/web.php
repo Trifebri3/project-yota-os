@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 // Public Portal routes
 Route::get('/', [PublicPortalController::class, 'index'])->name('home');
 Route::get('/projects/{program}', [PublicPortalController::class, 'showProjectExperience'])->name('public.projects.show');
+Route::get('/projects/{program}/laporan-bukti', [PublicPortalController::class, 'showEvidenceReport'])->name('public.projects.evidence-report');
 Route::get('/map-data', [PublicPortalController::class, 'getMapData'])->name('map.data');
 Route::get('/certificate/verify/{code}', [VolunteerController::class, 'verifyCertificate'])->name('certificates.verify');
 Route::get('/inventory/asset/{id}', [\App\Http\Controllers\InventoryController::class, 'scan'])->name('inventory.scan');

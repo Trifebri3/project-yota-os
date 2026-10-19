@@ -7,9 +7,14 @@
                 <h1 class="text-xl font-bold text-slate-900 mt-2">Preview LPJ Otomatis</h1>
                 <p class="text-xs text-slate-400 mt-1">Laporan Pertanggungjawaban dihasilkan secara instan dari database keuangan dan logbook lapangan.</p>
             </div>
-            <button onclick="window.print()" class="bg-[#4CAF50] hover:bg-[#2E7D32] text-white text-xs font-bold px-5 py-2.5 rounded-full shadow transition">
-                Cetak LPJ / Ekspor PDF
-            </button>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('public.projects.evidence-report', $program->id) }}" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow transition inline-flex items-center gap-1.5">
+                    <span>📑 Dokumen Bukti & Laporan (v1.0) &rarr;</span>
+                </a>
+                <button onclick="window.print()" class="bg-[#4CAF50] hover:bg-[#2E7D32] text-white text-xs font-bold px-5 py-2.5 rounded-full shadow transition">
+                    Cetak LPJ / Ekspor PDF
+                </button>
+            </div>
         </div>
 
         <!-- Printable Document Output Container -->

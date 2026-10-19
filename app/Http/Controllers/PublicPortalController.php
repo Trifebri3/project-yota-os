@@ -81,18 +81,22 @@ class PublicPortalController extends Controller
         $carbonMetrics = $carbonService->getProgramMetrics($program->id);
 
         // Real field logbooks with photos and activities
-        $realLogbooks = Logbook::where('program_id', $program->id)
+        $logbookQuery = Logbook::where('program_id', $program->id)
             ->whereNotNull('photo_path')
             ->with('user')
-            ->orderBy('date', 'asc')
-            ->get();
+            ->orderBy('date', 'asc');
 
-        // Keywords that indicate prime field milestones
-        $milestoneKeywords = ['berangkat', 'kunjungan', 'silaturahmi', 'sampah', 'material', 'pembuatan', 'petani', 'hajat', 'web', 'kompos', 'maggot', 'pantai', 'kepulangan', 'peninjauan', 'finishing', 'lahan'];
+        if ($program->start_date && $program->end_date) {
+            $logbookQuery->whereBetween('date', [
+                $program->start_date->format('Y-m-d 00:00:00'),
+                $program->end_date->format('Y-m-d 23:59:59')
+            ]);
+        }
+        $realLogbooks = $logbookQuery->get();
 
         $byDate = $realLogbooks->groupBy(function($l) {
             return substr($l->date, 0, 10);
-        });
+        })->sortKeys();
 
         $curatedStoryLogs = collect();
         $dailyGroups = collect();
@@ -100,23 +104,48 @@ class PublicPortalController extends Controller
         $dayIndex = 1;
 
         foreach ($byDate as $dateStr => $logsOnDate) {
-            // Get all field logs on this date from different people
-            $meaningfulLogs = $logsOnDate->filter(function($l) {
-                return !str_contains($l->photo_path, 'selfies') && !str_contains(strtolower($l->title), 'sholat subuh');
+            // Sort logs within the day: substantive field actions first, followed by routine/attendance
+            $sortedLogs = $logsOnDate->sortByDesc(function($l) {
+                $t = strtolower($l->title);
+                $score = 0;
+                
+                // Specific high-impact project milestones and actions
+                $keywords = [
+                    'bersih pantai', 'coastal', 'sampah', 'insinerator', 'kompos', 'maggot', 
+                    'hajat laut', 'tempat sampah', 'silaturahmi', 'kunjungan', 'keberangkatan', 
+                    'kepulangan', 'purbayani cup', 'umkm', 'qris', 'edukasi', 'bale resik', 
+                    'peninjauan', 'pemantauan', 'simulasi', 'finishing', 'pemasangan', 'lahan',
+                    'pertanian', 'pariwisata', 'material', 'struktur'
+                ];
+                foreach ($keywords as $kw) {
+                    if (str_contains($t, $kw)) {
+                        $score += 60;
+                        break;
+                    }
+                }
+                
+                if (str_contains($t, '[tugas]')) $score += 35;
+                if (str_contains($t, '[aktivitas tambahan]')) $score += 25;
+                if (str_contains($t, '[to-do]')) $score += 20;
+                if (str_contains($l->photo_path, 'documentations')) $score += 25;
+                if (str_contains($l->photo_path, 'task_')) $score += 15;
+                if (str_contains($l->photo_path, 'presensi_admin')) $score += 10;
+                
+                // Deprioritize routine and simple check-ins for the main title & first photos
+                if (str_contains($t, 'kegiatan rutin')) $score -= 40;
+                if (str_contains($t, 'sholat')) $score -= 50;
+                if (str_contains($t, 'olahraga')) $score -= 30;
+                if (str_contains($t, 'absen harian') || str_contains($t, 'check-in umum')) $score -= 45;
+                if (str_contains($t, 'check-out')) $score -= 45;
+                
+                return $score;
             })->values();
 
-            // Filter only volunteers and project officers
-            $meaningfulLogs = $meaningfulLogs->filter(function($l) {
-                if (!$l->user) return false;
-                $role = strtolower($l->user->role ?? '');
-                return in_array($role, ['volunteer', 'peserta', 'project-officer']);
-            })->values();
-
-            if ($meaningfulLogs->isEmpty()) {
+            if ($sortedLogs->isEmpty()) {
                 continue;
             }
 
-            foreach ($meaningfulLogs as $ml) {
+            foreach ($sortedLogs as $ml) {
                 if ($ml->user) {
                     $uniqueVolunteers->push([
                         'id' => $ml->user->id,
@@ -125,25 +154,42 @@ class PublicPortalController extends Controller
                 }
             }
 
-            $primaryLog = $meaningfulLogs->first();
+            $primaryLog = $sortedLogs->first();
             if ($primaryLog) {
                 $primaryLog->day_number = $dayIndex;
                 $primaryLog->formatted_day = 'Day ' . sprintf('%02d', $dayIndex);
                 $curatedStoryLogs->push($primaryLog);
             }
 
+            // Clean title for neat presentation
+            $cleanTitle = preg_replace('/^\[.*?\]\s*/', '', $primaryLog->title ?? 'Aksi Lapangan');
+            $cleanTitle = ucfirst(trim($cleanTitle));
+
             $dailyGroups->push([
                 'day_number' => $dayIndex,
                 'formatted_day' => 'Day ' . sprintf('%02d', $dayIndex),
                 'date_str' => \Carbon\Carbon::parse($dateStr)->format('d M Y'),
-                'total_photos' => $meaningfulLogs->count(),
-                'primary_title' => $primaryLog->title ?? 'Aksi Lapangan',
-                'logs' => $meaningfulLogs->map(function($l) {
+                'total_photos' => $sortedLogs->count(),
+                'primary_title' => $cleanTitle,
+                'logs' => $sortedLogs->map(function($l) {
+                    $timeStr = '';
+                    if ($l->date) {
+                        try {
+                            $timeStr = \Carbon\Carbon::parse($l->date)->format('H:i');
+                        } catch (\Exception $e) {
+                            $timeStr = '10:00';
+                        }
+                    }
+                    $photo = $l->photo_path;
+                    if ($photo && !str_starts_with($photo, 'http') && !str_starts_with($photo, '/')) {
+                        $photo = '/' . $photo;
+                    }
                     return [
                         'id' => $l->id,
                         'title' => $l->title,
                         'content' => $l->content,
-                        'photo_path' => $l->photo_path,
+                        'photo_path' => $photo,
+                        'time' => $timeStr ?: '10:00',
                         'user_id' => $l->user_id,
                         'user_name' => $l->user->name ?? 'Relawan',
                         'user_role' => $l->user->role ?? 'Volunteer',
@@ -216,6 +262,25 @@ class PublicPortalController extends Controller
             'locationPhotos',
             'otherPrograms'
         ));
+    }
+
+    /**
+     * Dedicated Evidence Review & Program Report Document (Laporan Program & Tinjauan Bukti).
+     */
+    public function showEvidenceReport($id)
+    {
+        $program = Program::with([
+            'projectCharter',
+            'storyMilestones',
+            'impactChains',
+            'kpiIndicators',
+            'projectOutputs',
+            'beforeAfterRecords',
+            'zones',
+            'financeTransactions',
+        ])->findOrFail($id);
+
+        return view('public.evidence-report', compact('program'));
     }
 
     /**

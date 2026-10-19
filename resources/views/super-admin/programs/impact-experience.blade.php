@@ -17,6 +17,9 @@
             </div>
 
             <div class="flex items-center gap-2">
+                <a href="{{ route('public.projects.evidence-report', $program->id) }}" target="_blank" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                    <span>📑 Laporan & Tinjauan Bukti (v1.0) &rarr;</span>
+                </a>
                 <a href="{{ route('public.projects.show', $program->id) }}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-1.5">
                     <span>Lihat Halaman Publik (Nuansa Putih) &rarr;</span>
                 </a>
