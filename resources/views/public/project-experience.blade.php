@@ -371,12 +371,18 @@
                 @forelse($assignedUsers as $person)
                     <div class="polaroid-card p-4 text-center space-y-3 flex flex-col items-center group">
                         <!-- Selfie Photo Bubble with Halos -->
-                        <div class="w-20 h-20 rounded-full overflow-hidden bg-slate-100 border-4 border-white shadow-md group-hover:scale-110 transition duration-300 relative">
+                        <div class="w-20 h-20 rounded-full overflow-hidden bg-slate-100 border-4 border-white shadow-md group-hover:scale-110 transition duration-300 relative flex items-center justify-center">
                             @if($person->avatar_photo)
-                                <img src="{{ $person->avatar_photo }}" alt="{{ $person->name }}" class="w-full h-full object-cover">
+                                <img src="{{ $person->avatar_photo }}" 
+                                     alt="{{ $person->name }}" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                                <div class="hidden w-full h-full bg-gradient-to-tr from-emerald-400 to-teal-500 flex items-center justify-center font-black text-white text-xl">
+                                    {{ strtoupper(substr($person->name, 0, 1)) }}
+                                </div>
                             @else
                                 <div class="w-full h-full bg-gradient-to-tr from-emerald-400 to-teal-500 flex items-center justify-center font-black text-white text-xl">
-                                    {{ substr($person->name, 0, 1) }}
+                                    {{ strtoupper(substr($person->name, 0, 1)) }}
                                 </div>
                             @endif
                         </div>
@@ -1051,10 +1057,9 @@
                     if (!mapEl) return;
                     
                     const map = L.map('deck-map').setView([-6.089000, 106.720000], 11);
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                        attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap contributors',
-                        subdomains: 'abcd',
-                        maxZoom: 20
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, USGS',
+                        maxZoom: 19
                     }).addTo(map);
 
                     fetch('/map-data?program_id={{ $program->id }}')

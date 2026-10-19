@@ -160,10 +160,9 @@
         document.addEventListener('DOMContentLoaded', function () {
             map = L.map('draw-map').setView([-6.200000, 106.816666], 11);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap contributors',
-                subdomains: 'abcd',
-                maxZoom: 20
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, USGS',
+                maxZoom: 19
             }).addTo(map);
 
             // Draw click points

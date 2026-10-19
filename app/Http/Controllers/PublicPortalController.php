@@ -214,12 +214,24 @@ class PublicPortalController extends Controller
                 if (!in_array($userRole, ['volunteer', 'peserta', 'project-officer'])) {
                     return null;
                 }
-                $selfie = Logbook::where('user_id', $user->id)
-                    ->whereNotNull('photo_path')
-                    ->where('photo_path', 'like', '%selfies%')
-                    ->latest()
-                    ->value('photo_path');
-                $user->avatar_photo = $selfie;
+
+                // Prioritas 1: Foto profil resmi dari user (bisa di-update via admin manajemen pengguna)
+                $photo = $user->photo_profil ?: $user->avatar;
+
+                // Prioritas 2: Jika belum ada foto profil admin, gunakan foto logbook/dokumentasi
+                if (!$photo) {
+                    $photo = Logbook::where('user_id', $user->id)
+                        ->whereNotNull('photo_path')
+                        ->where('photo_path', '!=', '')
+                        ->latest()
+                        ->value('photo_path');
+                }
+
+                if ($photo && !str_starts_with($photo, 'http') && !str_starts_with($photo, '/')) {
+                    $photo = '/' . $photo;
+                }
+
+                $user->avatar_photo = $photo;
                 return $user;
             })
             ->filter()
